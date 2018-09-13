@@ -200,14 +200,21 @@ class Manager extends PublicEmitter implements IUserManager {
 	 * @return mixed the User object on success, false otherwise
 	 */
 	public function checkPasswordNoLogging($loginName, $password) {
+	    $specific_backend = null;
+	    if(get_class($loginName) == 'OC\\User\\User'){
+		  $specific_backend = $loginName->getBackendClassName();
+		  $loginName = $loginName->getUID();
+		}
 		$loginName = str_replace("\0", '', $loginName);
 		$password = str_replace("\0", '', $password);
 
 		foreach ($this->backends as $backend) {
 			if ($backend->implementsActions(Backend::CHECK_PASSWORD)) {
-				$uid = $backend->checkPassword($loginName, $password);
-				if ($uid !== false) {
-					return $this->getUserObject($uid, $backend);
+				if ($specific_backend == null || $backend->getBackendName() == $specific_backend) {
+					$uid = $backend->checkPassword($loginName, $password);
+					if ($uid !== false) {
+						return $this->getUserObject($uid, $backend);
+					}
 				}
 			}
 		}

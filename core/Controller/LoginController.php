@@ -300,11 +300,7 @@ class LoginController extends Controller {
 			$users = $this->userManager->getByEmail($user);
 			// we only allow login by email if unique
 			if (count($users) === 1) {
-				$previousUser = $user;
-				$user = $users[0]->getUID();
-				if($user !== $previousUser) {
-					$loginResult = $this->userManager->checkPassword($user, $password);
-				}
+				$loginResult = $this->userManager->checkPassword($users[0], $password);
 			}
 		}
 
